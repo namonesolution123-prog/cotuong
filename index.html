@@ -5,118 +5,65 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hội Cờ Tướng Đường Số 8</title>
     <style>
-        /* Tối ưu hóa tổng thể cho điện thoại */
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            font-family: -apple-system, sans-serif; 
             background-color: #f0f2f5; 
-            margin: 0; 
-            padding: 0; 
-            -webkit-font-smoothing: antialiased;
+            margin: 0; padding: 0; 
         }
 
-        /* Thanh tiêu đề cố định ở trên cùng */
         .main-header {
-            background: linear-gradient(135deg, #ff416c, #ff4b2b);
+            background: linear-gradient(135deg, #d32f2f, #b71c1c);
             color: white;
             text-align: center;
-            padding: 15px 10px;
+            padding: 15px;
             font-size: 20px;
             font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        /* Khung chứa các bảng */
-        .content-container {
-            padding: 10px;
-            padding-bottom: 50px; /* Khoảng trống dưới cùng */
-        }
-
-        /* Tiêu đề cho mỗi bảng */
         .section-header {
-            background-color: white;
-            color: #333;
+            background: #fff;
+            color: #d32f2f;
             padding: 12px;
-            margin-top: 15px;
-            margin-bottom: 0;
+            margin: 15px 10px 0 10px;
             border-radius: 8px 8px 0 0;
-            font-size: 16px;
             font-weight: bold;
-            display: flex;
-            align-items: center;
             border-bottom: 2px solid #eee;
         }
-        .section-header i { margin-right: 8px; font-style: normal; }
 
-        /* Khung chứa iframe để bo góc và đổ bóng */
-        .iframe-wrapper {
-            background: white;
+        /* KHUNG CHE DÒNG CHỮ GOOGLE */
+        .iframe-container {
+            margin: 0 10px 20px 10px;
+            background: #fff;
             border-radius: 0 0 8px 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            overflow: hidden; /* Để bo góc iframe */
-            margin-bottom: 20px;
-            border: 1px solid #eee;
-            border-top: none;
+            overflow: hidden; /* Cắt bỏ phần thừa */
+            position: relative;
         }
 
-        /* Cấu hình iframe cho Bảng xếp hạng - Hiện đủ 9 người không cần cuộn */
-        .embed-bxh {
+        /* Mẹo: Cho iframe cao hơn khung chứa rồi dịch chuyển nó lên trên */
+        iframe {
             width: 100%;
-            height: 380px; /* Chiều cao vừa đủ cho 9-10 hàng */
             border: none;
             display: block;
+            margin-bottom: -35px; /* Đẩy dòng chữ Google xuống dưới vùng bị cắt */
         }
 
-        /* Cấu hình iframe cho Lịch sử & Tài trợ - Có thể cuộn bên trong */
-        .embed-scroll {
-            width: 100%;
-            height: 300px; /* Chiều cao cố định, anh em vuốt bên trong bảng */
-            border: none;
-            display: block;
-        }
+        .h-bxh { height: 430px; }      /* Chiều cao cho Bảng xếp hạng */
+        .h-lichsu { height: 350px; }   /* Chiều cao cho Lịch sử */
+        .h-taitro { height: 250px; }   /* Chiều cao cho Tài trợ */
 
-        /* Dòng chữ bản quyền dưới cùng */
-        .footer-text {
+        .footer {
             text-align: center;
             font-size: 12px;
-            color: #888;
+            color: #999;
             padding: 20px;
         }
     </style>
 </head>
 <body>
 
-    <div class="main-header">
-        🏆 GIẢI CỜ TƯỚNG NỘI BỘ
-    </div>
-
-    <div class="content-container">
-
-        <div class="section-header"><i>📊</i> BẢNG XẾP HẠNG TẠM TÍNH</div>
-        <div class="iframe-wrapper">
-            <iframe class="embed-bxh" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLws0BxhVqtQIlKBeAkdWJixSDsO_fek2dJrgUz4d8_cTZ5yoDZpCSdhJgdSGO6LqoSs2R0O6OGZYa/pubhtml?gid=1726277004&amp;single=true&amp;widget=false&amp;headers=false"></iframe>
-        </div>
-
-        <div class="section-header"><i>📜</i> LỊCH SỬ CÁC VÁN ĐẤU</div>
-        <div class="iframe-wrapper">
-            <iframe class="embed-scroll" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLws0BxhVqtQIlKBeAkdWJixSDsO_fek2dJrgUz4d8_cTZ5yoDZpCSdhJgdSGO6LqoSs2R0O6OGZYa/pubhtml?gid=0&amp;single=true&amp;widget=false&amp;headers=false"></iframe>
-        </div>
-
-        <div class="section-header"><i>🤝</i> DANH SÁCH NHÀ TÀI TRỢ</div>
-        <div class="iframe-wrapper">
-            <iframe class="embed-scroll" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLws0BxhVqtQIlKBeAkdWJixSDsO_fek2dJrgUz4d8_cTZ5yoDZpCSdhJgdSGO6LqoSs2R0O6OGZYa/pubhtml?gid=2004654405&amp;single=true&amp;widget=false&amp;headers=false"></iframe>
-        </div>
-
-        <div class="footer-text">
-            Dữ liệu tự động cập nhật từ Google Sheets<br>
-            Hội Cờ Đường Số 8 © 2026
-        </div>
-
-    </div>
-
-</body>
-</html>
+    <div class="main-header">🏆 GIẢI CỜ TƯỚNG NỘI BỘ</div>
