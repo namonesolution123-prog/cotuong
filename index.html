@@ -5,65 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hội Cờ Tướng Đường Số 8</title>
     <style>
-        body { 
-            font-family: -apple-system, sans-serif; 
-            background-color: #f0f2f5; 
-            margin: 0; padding: 0; 
-        }
-
+        body { font-family: sans-serif; background-color: #1a1a1a; margin: 0; padding: 0; color: white; }
+        
         .main-header {
-            background: linear-gradient(135deg, #d32f2f, #b71c1c);
+            background: #ff4b2b;
             color: white;
             text-align: center;
             padding: 15px;
             font-size: 20px;
             font-weight: bold;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            text-transform: uppercase;
         }
 
-        .section-header {
-            background: #fff;
-            color: #d32f2f;
-            padding: 12px;
-            margin: 15px 10px 0 10px;
-            border-radius: 8px 8px 0 0;
+        .section-title {
+            padding: 15px 10px 5px 10px;
             font-weight: bold;
-            border-bottom: 2px solid #eee;
+            color: #ff4b2b;
+            display: flex;
+            align-items: center;
         }
 
-        /* KHUNG CHE DÒNG CHỮ GOOGLE */
-        .iframe-container {
+        /* CHIÊU QUYẾT ĐỊNH: CẮT BỎ DÒNG CHỮ GOOGLE */
+        .clipper-box {
             margin: 0 10px 20px 10px;
-            background: #fff;
-            border-radius: 0 0 8px 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            overflow: hidden; /* Cắt bỏ phần thừa */
+            background: #222;
+            border-radius: 8px;
+            overflow: hidden; /* Cắt tất cả những gì tràn ra ngoài */
+            border: 1px solid #333;
             position: relative;
         }
 
-        /* Mẹo: Cho iframe cao hơn khung chứa rồi dịch chuyển nó lên trên */
         iframe {
             width: 100%;
             border: none;
             display: block;
-            margin-bottom: -35px; /* Đẩy dòng chữ Google xuống dưới vùng bị cắt */
+            /* Đẩy nội dung lên trên để dòng chữ Google bị lọt ra ngoài vùng nhìn thấy */
+            margin-top: -2px; 
+            margin-bottom: -30px; 
         }
 
-        .h-bxh { height: 430px; }      /* Chiều cao cho Bảng xếp hạng */
-        .h-lichsu { height: 350px; }   /* Chiều cao cho Lịch sử */
-        .h-taitro { height: 250px; }   /* Chiều cao cho Tài trợ */
+        /* Chiều cao khống chế cho từng bảng - Nam có thể chỉnh số này nếu bảng dài ra */
+        .h-bxh { height: 410px; } 
+        .h-lichsu { height: 350px; }
+        .h-taitro { height: 200px; }
 
-        .footer {
-            text-align: center;
-            font-size: 12px;
-            color: #999;
-            padding: 20px;
-        }
+        .footer { text-align: center; font-size: 11px; color: #555; padding: 20px; }
     </style>
 </head>
 <body>
 
     <div class="main-header">🏆 GIẢI CỜ TƯỚNG NỘI BỘ</div>
+
+    <div class="section-title">📊 BẢNG XẾP HẠNG TẠM TÍNH</div>
+    <div class="clipper-box">
+        <iframe class="h-bxh" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLws0BxhVqtQIlKBeAkdWJixSDsO_fek2dJrgUz4d8_cTZ5yoDZpCSdhJgdSGO6LqoSs2R0O6OGZYa/pubhtml?gid=1726277004&amp;single=true&amp;widget=false&amp;headers=false"></iframe>
+    </div>
+
+    <div class="section-title">📜 LỊCH SỬ CÁC VÁN ĐẤU</div>
+    <div class="clipper-box">
+        <iframe class="h-lichsu" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLws0BxhVqtQIlKBeAkdWJixSDsO_fek2dJrgUz4d8_cTZ5yoDZpCSdhJgdSGO6LqoSs2R0O6OGZYa/pubhtml?gid=0&amp;single=true&amp;widget=false&amp;headers=false"></iframe>
+    </div>
+
+    <div class="section-title">🤝 DANH SÁCH NHÀ TÀI TRỢ</div>
+    <div class="clipper-box">
+        <iframe class="h-taitro" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLws0BxhVqtQIlKBeAkdWJixSDsO_fek2dJrgUz4d8_cTZ5yoDZpCSdhJgdSGO6LqoSs2R0O6OGZYa/pubhtml?gid=2004654405&amp;single=true&amp;widget=false&amp;headers=false"></iframe>
+    </div>
+
+    <div class="footer">Dữ liệu bảo mật - Hội Cờ Đường Số 8</div>
+
+</body>
+</html>
