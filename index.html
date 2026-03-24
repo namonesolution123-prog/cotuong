@@ -2,42 +2,43 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hội Cờ Đường Số 8</title>
     <style>
         body { font-family: sans-serif; background-color: #1a1a1a; margin: 0; padding: 0; color: white; }
-        .main-header { background: #d32f2f; color: white; text-align: center; padding: 15px; font-size: 20px; font-weight: bold; }
+        .main-header { background: #d32f2f; color: white; text-align: center; padding: 15px; font-size: 18px; font-weight: bold; }
         
-        .section-container {
+        /* CỬA SỔ HIỂN THỊ: Cái này sẽ cắt bỏ phần thừa */
+        .window {
             margin: 10px;
-            background: #222;
+            background: #fff;
             border-radius: 8px;
-            overflow: hidden;
-            position: relative; /* Để làm nền cho lớp che */
-            border: 1px solid #333;
-        }
-
-        .section-title { padding: 12px; font-weight: bold; color: #ff4b2b; background: #2a2a2a; }
-
-        /* Khung chứa iframe */
-        .iframe-wrapper {
-            width: 100%;
-            height: 400px; /* Chiều cao mặc định */
+            overflow: hidden; /* QUAN TRỌNG: Chặt đứt dòng chữ Google */
             position: relative;
+            border: 2px solid #333;
         }
 
-        iframe { width: 100%; height: 100%; border: none; }
+        .section-title { padding: 10px; font-weight: bold; color: #ff4b2b; background: #2a2a2a; border-bottom: 1px solid #333; }
 
-        /* LỚP CHE DÒNG CHỮ GOOGLE */
-        .shield {
-            position: absolute;
-            bottom: 0;
-            left: 0;
+        /* NỘI DUNG BÊN TRONG: Ép nó dài hơn cửa sổ để phần đuôi bị mất */
+        .iframe-container {
             width: 100%;
-            height: 35px; /* Độ cao vừa đủ che dòng chữ */
-            background: #222; /* Trùng màu nền để nhìn như biến mất */
-            z-index: 10;
+            position: relative;
+            overflow: hidden;
         }
+
+        iframe {
+            width: 100%;
+            border: none;
+            display: block;
+            /* Đẩy phần chân Google lọt ra ngoài cửa sổ */
+            margin-bottom: -45px; 
+        }
+
+        /* Chiều cao cửa sổ nhìn thấy trên điện thoại */
+        .h-bxh { height: 400px; }
+        .h-ls { height: 350px; }
+        .h-tt { height: 200px; }
 
         .footer { text-align: center; font-size: 11px; color: #555; padding: 20px; }
     </style>
@@ -46,26 +47,24 @@
 
     <div class="main-header">🏆 GIẢI CỜ TƯỚNG NỘI BỘ</div>
 
-    <div class="section-container">
-        <div class="section-title">📊 BẢNG XẾP HẠNG TẠM TÍNH</div>
-        <div class="iframe-wrapper">
-            <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLws0BxhVqtQIlKBeAkdWJixSDsO_fek2dJrgUz4d8_cTZ5yoDZpCSdhJgdSGO6LqoSs2R0O6OGZYa/pubhtml?gid=1726277004&amp;single=true&amp;widget=false&amp;headers=false"></iframe>
-            <div class="shield"></div> </div>
-    </div>
-
-    <div class="section-container">
-        <div class="section-title">📜 LỊCH SỬ CÁC VÁN ĐẤU</div>
-        <div class="iframe-wrapper">
-            <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLws0BxhVqtQIlKBeAkdWJixSDsO_fek2dJrgUz4d8_cTZ5yoDZpCSdhJgdSGO6LqoSs2R0O6OGZYa/pubhtml?gid=0&amp;single=true&amp;widget=false&amp;headers=false"></iframe>
-            <div class="shield"></div>
+    <div class="section-title">📊 BẢNG XẾP HẠNG TẠM TÍNH</div>
+    <div class="window h-bxh">
+        <div class="iframe-container">
+            <iframe style="height: 445px;" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLws0BxhVqtQIlKBeAkdWJixSDsO_fek2dJrgUz4d8_cTZ5yoDZpCSdhJgdSGO6LqoSs2R0O6OGZYa/pubhtml?gid=1726277004&amp;single=true&amp;widget=false&amp;headers=false"></iframe>
         </div>
     </div>
 
-    <div class="section-container" style="margin-bottom: 30px;">
-        <div class="section-title">🤝 NHÀ TÀI TRỢ</div>
-        <div class="iframe-wrapper" style="height: 250px;">
-            <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLws0BxhVqtQIlKBeAkdWJixSDsO_fek2dJrgUz4d8_cTZ5yoDZpCSdhJgdSGO6LqoSs2R0O6OGZYa/pubhtml?gid=2004654405&amp;single=true&amp;widget=false&amp;headers=false"></iframe>
-            <div class="shield"></div>
+    <div class="section-title">📜 LỊCH SỬ CÁC VÁN ĐẤU</div>
+    <div class="window h-ls">
+        <div class="iframe-container">
+            <iframe style="height: 395px;" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLws0BxhVqtQIlKBeAkdWJixSDsO_fek2dJrgUz4d8_cTZ5yoDZpCSdhJgdSGO6LqoSs2R0O6OGZYa/pubhtml?gid=0&amp;single=true&amp;widget=false&amp;headers=false"></iframe>
+        </div>
+    </div>
+
+    <div class="section-title">🤝 NHÀ TÀI TRỢ</div>
+    <div class="window h-tt">
+        <div class="iframe-container">
+            <iframe style="height: 245px;" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLws0BxhVqtQIlKBeAkdWJixSDsO_fek2dJrgUz4d8_cTZ5yoDZpCSdhJgdSGO6LqoSs2R0O6OGZYa/pubhtml?gid=2004654405&amp;single=true&amp;widget=false&amp;headers=false"></iframe>
         </div>
     </div>
 
