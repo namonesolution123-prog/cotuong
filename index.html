@@ -1,63 +1,893 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hội Cờ Đường Số 8 - Bảng Xếp Hạng</title>
-    <style>
-        body { font-family: -apple-system, sans-serif; background-color: #f7f9fc; margin: 0; padding: 0; }
-        .main-header { background-color: #d32f2f; color: white; text-align: center; padding: 15px; font-size: 20px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .section-container { margin: 15px 10px; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e0e0e0; }
-        .section-title { padding: 12px; font-weight: bold; color: #d32f2f; border-bottom: 1px solid #eee; font-size: 16px; text-transform: uppercase; text-align: center; background: #fff5f5; }
-        .iframe-wrapper { width: 100%; height: 400px; position: relative; }
-        iframe { width: 100%; height: 100%; border: none; display: block; }
-        .footer { text-align: center; font-size: 12px; color: #999; padding: 20px; }
-        .beer-section { background: #d32f2f !important; color: white !important; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bảng Xếp Hạng 31 Đường 8</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #1F3864 0%, #4472C4 100%);
+    min-height: 100vh;
+    padding: 20px;
+    color: #222;
+  }
+  .container { max-width: 1280px; margin: 0 auto; }
+  header {
+    background: white;
+    padding: 24px 32px;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+  header h1 { color: #1F3864; font-size: 32px; margin-bottom: 6px; letter-spacing: 1px; }
+  header p { color: #666; font-size: 14px; }
+
+  .toolbar {
+    background: #F2F5FA;
+    padding: 12px 32px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #E0E6F0;
+    align-items: center;
+  }
+  .lock-badge {
+    margin-left: auto;
+    background: #FEF3C7;
+    color: #92400E;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .btn {
+    padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer;
+    font-weight: 600; font-size: 14px; transition: all 0.2s; white-space: nowrap;
+  }
+  .btn-primary { background: #4472C4; color: white; }
+  .btn-primary:hover { background: #1F3864; }
+  .btn-success { background: #70AD47; color: white; }
+  .btn-success:hover { background: #548235; }
+  .btn-warning { background: #ED7D31; color: white; }
+  .btn-warning:hover { background: #C55A11; }
+  .btn-danger { background: #C00000; color: white; }
+  .btn-danger:hover { background: #8B0000; }
+  .btn-secondary { background: #BFBFBF; color: #222; }
+  .btn-secondary:hover { background: #A6A6A6; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  .lbl-mobile { display: none; }
+
+  main {
+    background: white;
+    padding: 24px 32px;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+
+  .section { margin-bottom: 28px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: #FAFBFD; border: 1px solid #E0E6F0;
+    border-radius: 12px; padding: 20px;
+  }
+  .card h2 {
+    color: #1F3864; font-size: 18px; margin-bottom: 16px;
+    padding-bottom: 10px; border-bottom: 2px solid #4472C4;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card.history h2 { border-bottom-color: #C00000; }
+  .card.info h2 { border-bottom-color: #70AD47; }
+
+  .form-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+  .form-row label { font-size: 13px; font-weight: 600; color: #555; }
+  .form-row select, .form-row input, .form-row textarea {
+    padding: 10px 12px; border: 1.5px solid #D0D7E2; border-radius: 8px;
+    font-size: 14px; font-family: inherit; background: white;
+  }
+  .form-row select:focus, .form-row input:focus, .form-row textarea:focus {
+    outline: none; border-color: #4472C4;
+  }
+  .vs-label { text-align: center; color: #C00000; font-weight: 700; font-size: 18px; margin: 4px 0; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th {
+    background: #4472C4; color: white; padding: 12px 10px; text-align: center;
+    font-weight: 600; font-size: 13px; position: sticky; top: 0;
+  }
+  th.history { background: #C00000; }
+  td { padding: 10px; border-bottom: 1px solid #E0E6F0; text-align: center; }
+  tbody tr:hover { background: #F2F5FA; }
+  .name-col { text-align: left !important; font-weight: 600; }
+  .elo-col { font-weight: 700; color: #1F3864; font-size: 16px; }
+
+  .rank-medal {
+    display: inline-block; width: 32px; height: 32px; line-height: 32px;
+    border-radius: 50%; font-weight: 700; color: white; font-size: 14px;
+  }
+  .rank-1 { background: #FFD700; color: #5C4400; box-shadow: 0 2px 8px rgba(255,215,0,0.5); }
+  .rank-2 { background: #C0C0C0; color: #333; }
+  .rank-3 { background: #CD7F32; }
+  .rank-other { background: #BFBFBF; color: #555; }
+
+  .tier {
+    display: inline-block; padding: 5px 14px; border-radius: 20px;
+    font-weight: 700; font-size: 12px; color: white; white-space: nowrap;
+  }
+  .tier-tap-su { background: #BFBFBF; color: #333; }
+  .tier-ky-thu { background: #9DC3E6; color: #1F3864; }
+  .tier-ky-sy { background: #70AD47; }
+  .tier-ky-vuong { background: #FFD966; color: #5C4400; }
+  .tier-ky-thanh { background: #ED7D31; }
+  .tier-ky-tien { background: #C00000; }
+  .tier-tong-su { background: linear-gradient(135deg, #7030A0, #4B0082); }
+
+  .scroll-table { max-height: 520px; overflow-y: auto; overflow-x: auto; border-radius: 8px; border: 1px solid #E0E6F0; }
+  .empty-state { text-align: center; padding: 32px 16px; color: #999; font-style: italic; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .stat-card {
+    background: linear-gradient(135deg, #4472C4, #1F3864);
+    color: white; padding: 16px; border-radius: 12px; text-align: center;
+  }
+  .stat-card .num { font-size: 28px; font-weight: 700; }
+  .stat-card .lbl { font-size: 12px; opacity: 0.9; margin-top: 4px; }
+
+  /* Mobile leaderboard cards */
+  .lb-mobile { display: none; flex-direction: column; gap: 8px; }
+  .lb-row {
+    background: white; border: 1px solid #E0E6F0; border-radius: 10px;
+    padding: 10px 12px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    column-gap: 10px; row-gap: 6px;
+  }
+  .lb-row .lb-medal { grid-row: 1 / 3; }
+  .lb-row .lb-name { font-weight: 700; color: #1F3864; font-size: 15px; }
+  .lb-row .lb-elo { font-weight: 700; color: #1F3864; font-size: 18px; text-align: right; }
+  .lb-row .lb-meta {
+    grid-column: 2 / 4;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; color: #666; gap: 8px;
+  }
+  .lb-row .lb-meta .wl { display: flex; gap: 10px; }
+  .lb-row .lb-meta b { font-weight: 700; }
+
+  /* Mobile history cards */
+  .hist-mobile { display: none; flex-direction: column; gap: 8px; }
+  .hist-row {
+    background: white; border: 1px solid #E0E6F0; border-radius: 10px;
+    padding: 10px 12px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 8px; align-items: center;
+  }
+  .hist-row .hist-result { display: flex; align-items: center; gap: 6px; font-size: 14px; flex-wrap: wrap; }
+  .hist-row .hist-w { color: #70AD47; font-weight: 700; }
+  .hist-row .hist-l { color: #C00000; }
+  .hist-row .hist-meta { font-size: 11px; color: #888; grid-column: 1 / 3; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; font-size: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .swatch { width: 14px; height: 14px; border-radius: 3px; }
+
+  .toast {
+    position: fixed; top: 16px; right: 16px; left: 16px;
+    max-width: 360px; margin: 0 auto;
+    background: #70AD47; color: white;
+    padding: 14px 24px; border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 2000; animation: slideIn 0.3s;
+    font-weight: 600; text-align: center;
+  }
+  .toast.error { background: #C00000; }
+  .toast.warning { background: #ED7D31; }
+  @keyframes slideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    display: none; align-items: center; justify-content: center;
+    z-index: 1000; padding: 16px;
+  }
+  .modal-bg.show { display: flex; }
+  .modal {
+    background: white; border-radius: 12px; padding: 24px;
+    max-width: 700px; width: 100%; max-height: 90vh; overflow-y: auto;
+  }
+  .modal h3 { color: #1F3864; margin-bottom: 16px; font-size: 18px; }
+  .modal .name-edit { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+  .modal .name-edit span { width: 30px; color: #666; font-weight: 600; flex-shrink: 0; }
+  .modal .name-edit input { flex: 1; padding: 8px; border: 1px solid #D0D7E2; border-radius: 6px; min-width: 0; }
+
+  .pwd-input {
+    width: 100%; padding: 14px; font-size: 16px;
+    border: 2px solid #D0D7E2; border-radius: 8px;
+    text-align: center; letter-spacing: 4px; font-family: monospace;
+  }
+  .pwd-input:focus { outline: none; border-color: #4472C4; }
+
+  .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .info-grid .form-row { margin-bottom: 0; }
+
+  .player-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .player-card {
+    background: white; border: 1px solid #E0E6F0; border-radius: 10px;
+    padding: 14px; cursor: pointer; transition: all 0.2s;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .player-card:hover, .player-card:active { border-color: #70AD47; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .player-card .pc-name { font-weight: 700; color: #1F3864; font-size: 15px; }
+  .player-card .pc-real { font-size: 13px; color: #666; }
+  .player-card .pc-meta { font-size: 12px; color: #888; display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* ============ MOBILE ============ */
+  @media (max-width: 700px) {
+    body { padding: 8px; }
+    header { padding: 16px 12px; border-radius: 12px 12px 0 0; }
+    header h1 { font-size: 20px; letter-spacing: 0.3px; }
+    header p { font-size: 11px; }
+    main { padding: 14px 12px; border-radius: 0 0 12px 12px; }
+    .section { margin-bottom: 18px; }
+
+    .toolbar {
+      padding: 10px 12px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+    .toolbar .btn { padding: 10px 6px; font-size: 12px; width: 100%; }
+    .lock-badge { display: none; }
+    .lbl-desktop { display: none; }
+    .lbl-mobile { display: inline; }
+
+    .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 14px; }
+    .stat-card { padding: 12px 8px; border-radius: 10px; }
+    .stat-card .num { font-size: 22px; }
+    .stat-card .lbl { font-size: 11px; }
+
+    .card { padding: 12px; border-radius: 10px; }
+    .card h2 { font-size: 16px; margin-bottom: 12px; padding-bottom: 8px; }
+
+    .lb-desktop { display: none; }
+    .lb-mobile { display: flex; max-height: 60vh; overflow-y: auto; padding-right: 4px; }
+    .hist-desktop { display: none; }
+    .hist-mobile { display: flex; max-height: 50vh; overflow-y: auto; padding-right: 4px; }
+
+    .vs-label { font-size: 16px; }
+    .form-row label { font-size: 12px; }
+    .form-row select, .form-row input, .form-row textarea { padding: 9px 10px; font-size: 13px; }
+    .btn-sm { padding: 5px 10px; font-size: 11px; }
+
+    .player-cards-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+    .player-card { padding: 10px; }
+    .player-card .pc-name { font-size: 13px; }
+    .player-card .pc-real { font-size: 11px; }
+    .player-card .pc-meta { font-size: 10px; }
+
+    .info-grid { grid-template-columns: 1fr; gap: 10px; }
+
+    .modal { padding: 16px; max-height: 92vh; }
+    .modal h3 { font-size: 16px; margin-bottom: 12px; }
+
+    .legend { font-size: 10px; gap: 6px; }
+    .swatch { width: 10px; height: 10px; }
+
+    .rank-medal { width: 28px; height: 28px; line-height: 28px; font-size: 13px; }
+  }
+
+  @media (max-width: 380px) {
+    header h1 { font-size: 17px; }
+    .toolbar { grid-template-columns: 1fr; }
+  }
+</style>
 </head>
 <body>
+<div class="container">
+  <header>
+    <h1>♟️ BẢNG XẾP HẠNG 31 ĐƯỜNG 8</h1>
+    <p>16 kỳ thủ • Thắng +5 Elo • Thua -5 Elo • Hòa: 0 điểm</p>
+  </header>
 
-    <div class="main-header">🏆 GIẢI CỜ TƯỚNG NỘI BỘ</div>
+  <div class="toolbar">
+    <button class="btn btn-success" onclick="exportExcel()">📥 <span class="lbl-desktop">Xuất Excel</span><span class="lbl-mobile">Xuất Excel</span></button>
+    <button class="btn btn-primary" onclick="openEditNames()">✏️ <span class="lbl-desktop">Sửa tên kỳ thủ</span><span class="lbl-mobile">Sửa tên</span></button>
+    <button class="btn btn-warning" onclick="undoLast()">↩️ <span class="lbl-desktop">Hoàn tác trận cuối</span><span class="lbl-mobile">Hoàn tác</span> 🔒</button>
+    <button class="btn btn-danger" onclick="resetAll()">🔄 <span class="lbl-desktop">Đặt lại toàn bộ</span><span class="lbl-mobile">Đặt lại</span> 🔒</button>
+    <button class="btn btn-secondary" onclick="openChangePwd()">🔑 <span class="lbl-desktop">Đổi mật khẩu</span><span class="lbl-mobile">Mật khẩu</span></button>
+    <span class="lock-badge">🔒 Bảo vệ bằng mật khẩu</span>
+  </div>
 
-    <div class="section-container">
-        <div class="section-title">📊 BẢNG XẾP HẠNG - BẢNG A</div>
-        <div class="iframe-wrapper">
-            <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLws0BxhVqtQIlKBeAkdWJixSDsO_fek2dJrgUz4d8_cTZ5yoDZpCSdhJgdSGO6LqoSs2R0O6OGZYa/pubhtml?gid=226505197&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
+  <main>
+    <div class="section">
+      <div class="stat-grid" id="stats"></div>
+
+      <div class="card">
+        <h2>🏆 Bảng Xếp Hạng</h2>
+
+        <div class="scroll-table lb-desktop">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:60px">Hạng</th>
+                <th>Tên Kỳ Thủ</th>
+                <th>Trận</th>
+                <th>Thắng</th>
+                <th>Thua</th>
+                <th>Elo</th>
+                <th>Cấp Bậc</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard"></tbody>
+          </table>
         </div>
-    </div>
 
-    <div class="section-container">
-        <div class="section-title">📊 BẢNG XẾP HẠNG - BẢNG B</div>
-        <div class="iframe-wrapper">
-            <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLws0BxhVqtQIlKBeAkdWJixSDsO_fek2dJrgUz4d8_cTZ5yoDZpCSdhJgdSGO6LqoSs2R0O6OGZYa/pubhtml?gid=484335156&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
+        <div class="lb-mobile" id="leaderboardMobile"></div>
+
+        <div class="legend">
+          <div class="legend-item"><span class="swatch" style="background:#BFBFBF"></span>Tập Sự</div>
+          <div class="legend-item"><span class="swatch" style="background:#9DC3E6"></span>Kỳ Thủ</div>
+          <div class="legend-item"><span class="swatch" style="background:#70AD47"></span>Kỳ Sỹ</div>
+          <div class="legend-item"><span class="swatch" style="background:#FFD966"></span>Kỳ Vương</div>
+          <div class="legend-item"><span class="swatch" style="background:#ED7D31"></span>Kỳ Thánh</div>
+          <div class="legend-item"><span class="swatch" style="background:#C00000"></span>Kỳ Tiên</div>
+          <div class="legend-item"><span class="swatch" style="background:#7030A0"></span>Tông Sư</div>
         </div>
+      </div>
     </div>
 
-    <div class="section-container">
-        <div class="section-title">📜 LỊCH SỬ CÁC VÁN ĐẤU</div>
-        <div class="iframe-wrapper" style="height: 350px;">
-            <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLws0BxhVqtQIlKBeAkdWJixSDsO_fek2dJrgUz4d8_cTZ5yoDZpCSdhJgdSGO6LqoSs2R0O6OGZYa/pubhtml?gid=0&amp;single=true&amp;widget=false&amp;headers=false"></iframe>
+    <div class="section grid-2">
+      <div class="card">
+        <h2>⚔️ Thêm Trận Đấu Mới</h2>
+        <div class="form-row">
+          <label>Người thắng 🏆</label>
+          <select id="winner"></select>
         </div>
-    </div>
-
-    <div class="section-container">
-        <div class="section-title">🤝 DANH SÁCH NHÀ TÀI TRỢ</div>
-        <div class="iframe-wrapper" style="height: 250px;">
-            <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLws0BxhVqtQIlKBeAkdWJixSDsO_fek2dJrgUz4d8_cTZ5yoDZpCSdhJgdSGO6LqoSs2R0O6OGZYa/pubhtml?gid=2004654405&amp;single=true&amp;widget=false&amp;headers=false"></iframe>
+        <div class="vs-label">VS</div>
+        <div class="form-row">
+          <label>Người thua</label>
+          <select id="loser"></select>
         </div>
-    </div>
-
-    <div class="section-container" style="margin-top: 25px;">
-        <div class="section-title beer-section">🍻 GÓC KỶ NIỆM (ĂN NHẬU)</div>
-        <div class="iframe-wrapper" style="height: 600px;">
-            <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRLws0BxhVqtQIlKBeAkdWJixSDsO_fek2dJrgUz4d8_cTZ5yoDZpCSdhJgdSGO6LqoSs2R0O6OGZYa/pubhtml?gid=2081925766&amp;single=true&amp;widget=false&amp;headers=false"></iframe>
+        <div class="form-row">
+          <label>Ngày</label>
+          <input type="date" id="matchDate">
         </div>
+        <div class="form-row">
+          <label>Ghi chú (tùy chọn)</label>
+          <input type="text" id="note" placeholder="VD: Vòng 1, Bán kết...">
+        </div>
+        <button class="btn btn-success" style="width:100%; padding: 12px;" onclick="addMatch()">
+          ✅ Ghi nhận kết quả
+        </button>
+      </div>
+
+      <div class="card history">
+        <h2>📜 Lịch Sử Đấu (<span id="matchCount">0</span>)</h2>
+
+        <div class="scroll-table hist-desktop">
+          <table>
+            <thead>
+              <tr>
+                <th class="history">STT</th>
+                <th class="history">Ngày</th>
+                <th class="history">Thắng</th>
+                <th class="history">Thua</th>
+                <th class="history">Ghi chú</th>
+                <th class="history">🔒</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+
+        <div class="hist-mobile" id="historyMobile"></div>
+      </div>
     </div>
 
-    <div class="footer">
-        Cập nhật tự động từ Google Sheets<br>
-        Hội Cờ Đường Số 8 © 2026
+    <div class="section">
+      <div class="card info">
+        <h2>👥 Thông Tin Kỳ Thủ</h2>
+        <p style="color:#666; font-size:13px; margin-bottom:14px;">Bấm vào kỳ thủ để xem hoặc sửa thông tin</p>
+        <div class="player-cards-grid" id="playerCards"></div>
+      </div>
     </div>
+  </main>
+</div>
 
+<div class="modal-bg" id="modalEdit">
+  <div class="modal">
+    <h3>✏️ Sửa tên 16 kỳ thủ</h3>
+    <p style="color:#666; font-size:13px; margin-bottom:12px;">Đổi tên sẽ tự cập nhật trong toàn bộ lịch sử.</p>
+    <div id="nameEditList"></div>
+    <div style="margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end;">
+      <button class="btn btn-secondary" onclick="closeModal('modalEdit')">Hủy</button>
+      <button class="btn btn-success" onclick="saveNames()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalPlayer">
+  <div class="modal">
+    <h3 id="playerModalTitle">👤 Thông tin kỳ thủ</h3>
+    <div class="info-grid">
+      <div class="form-row"><label>Biệt danh</label><input type="text" id="pi-nickname" disabled style="background:#F0F0F0"></div>
+      <div class="form-row"><label>Họ và tên</label><input type="text" id="pi-fullname" placeholder="VD: Nguyễn Văn A"></div>
+      <div class="form-row"><label>Tuổi</label><input type="number" id="pi-age" min="0" max="150"></div>
+      <div class="form-row"><label>Số điện thoại</label><input type="tel" id="pi-phone" placeholder="0901234567"></div>
+      <div class="form-row"><label>Ngày tham gia</label><input type="date" id="pi-joined"></div>
+      <div class="form-row"><label>Sở trường</label><input type="text" id="pi-strength" placeholder="VD: Pháo đầu..."></div>
+    </div>
+    <div class="form-row" style="margin-top: 12px;">
+      <label>Ghi chú</label>
+      <textarea id="pi-note" rows="3" placeholder="Ghi chú thêm..."></textarea>
+    </div>
+    <div style="margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end;">
+      <button class="btn btn-secondary" onclick="closeModal('modalPlayer')">Đóng</button>
+      <button class="btn btn-success" onclick="savePlayerInfo()">💾 Lưu</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalPwd">
+  <div class="modal" style="max-width:400px;">
+    <h3>🔒 Nhập mật khẩu</h3>
+    <p style="color:#666; font-size:13px; margin-bottom:14px;" id="pwdDesc">Cần xác thực để thực hiện thao tác này</p>
+    <input type="password" id="pwdInput" class="pwd-input" placeholder="••••••••" autocomplete="off">
+    <div style="margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end;">
+      <button class="btn btn-secondary" onclick="cancelPwd()">Hủy</button>
+      <button class="btn btn-danger" onclick="confirmPwd()">Xác nhận</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalChangePwd">
+  <div class="modal" style="max-width:420px;">
+    <h3>🔑 Đổi mật khẩu</h3>
+    <div class="form-row"><label>Mật khẩu hiện tại</label><input type="password" id="oldPwd" class="pwd-input"></div>
+    <div class="form-row"><label>Mật khẩu mới</label><input type="password" id="newPwd" class="pwd-input"></div>
+    <div class="form-row"><label>Nhập lại mật khẩu mới</label><input type="password" id="newPwd2" class="pwd-input"></div>
+    <p style="color:#999; font-size:12px; margin-top:8px;">💡 Mật khẩu mặc định: <code style="background:#FEF3C7; padding:2px 6px; border-radius:4px;">31duong8</code></p>
+    <div style="margin-top: 16px; display: flex; gap: 8px; justify-content: flex-end;">
+      <button class="btn btn-secondary" onclick="closeModal('modalChangePwd')">Hủy</button>
+      <button class="btn btn-success" onclick="saveNewPwd()">Lưu</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'chess_31duong8_v2';
+const PWD_KEY = 'chess_31duong8_pwd';
+const STARTING_ELO = 1200;
+const DEFAULT_PWD = '31duong8';
+
+const DEFAULT_PLAYERS = [
+  "Thuấn", "Thường", "Huy Anh", "Huy Em", "Hội", "Thanh Duy",
+  "Quyền", "Hữu Trọng", "Hoàn Nguyễn", "Phạm Hậu", "Trinh", "Văn Khải",
+  "Đình Song", "Nhật Nguyễn", "Vân", "Liêm",
+];
+
+let state = {
+  players: DEFAULT_PLAYERS.map((name, i) => ({
+    id: i + 1, name, startElo: STARTING_ELO,
+    info: { fullname: '', age: '', phone: '', joined: new Date().toISOString().slice(0,10), strength: '', note: '' },
+  })),
+  matches: [],
+};
+
+let currentPlayerIdx = -1;
+let pendingAction = null;
+
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function load() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    try {
+      const loaded = JSON.parse(raw);
+      loaded.players = loaded.players.map(p => ({
+        ...p,
+        info: p.info || { fullname: '', age: '', phone: '', joined: new Date().toISOString().slice(0,10), strength: '', note: '' },
+      }));
+      state = loaded;
+    } catch(e) { console.error(e); }
+  }
+}
+function getPwd() { return localStorage.getItem(PWD_KEY) || DEFAULT_PWD; }
+function setPwd(p) { localStorage.setItem(PWD_KEY, p); }
+
+function getTier(elo) {
+  if (elo <= 1200) return { name: 'Tập Sự', cls: 'tier-tap-su' };
+  if (elo <= 1300) return { name: 'Kỳ Thủ', cls: 'tier-ky-thu' };
+  if (elo <= 1400) return { name: 'Kỳ Sỹ', cls: 'tier-ky-sy' };
+  if (elo <= 1500) return { name: 'Kỳ Vương', cls: 'tier-ky-vuong' };
+  if (elo <= 1600) return { name: 'Kỳ Thánh', cls: 'tier-ky-thanh' };
+  if (elo <= 1700) return { name: 'Kỳ Tiên', cls: 'tier-ky-tien' };
+  return { name: 'Nhất Đại Tông Sư', cls: 'tier-tong-su' };
+}
+function getTierShort(name) {
+  return name === 'Nhất Đại Tông Sư' ? 'Tông Sư' : name;
+}
+
+function computeStats() {
+  const stats = state.players.map(p => ({ ...p, wins: 0, losses: 0, total: 0, elo: p.startElo }));
+  const byName = {};
+  stats.forEach(s => byName[s.name] = s);
+  state.matches.forEach(m => {
+    if (byName[m.winner]) byName[m.winner].wins++;
+    if (byName[m.loser])  byName[m.loser].losses++;
+  });
+  stats.forEach(s => {
+    s.total = s.wins + s.losses;
+    s.elo = s.startElo + s.wins * 5 - s.losses * 5;
+    s.tier = getTier(s.elo);
+  });
+  return stats;
+}
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+function formatDate(s) {
+  if (!s) return '';
+  const [y,m,d] = s.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function render() {
+  const stats = computeStats();
+  const sorted = [...stats].sort((a,b) => b.elo - a.elo || b.wins - a.wins || a.name.localeCompare(b.name));
+
+  const totalMatches = state.matches.length;
+  const champion = sorted[0];
+  const masters = stats.filter(s => s.elo >= 1701).length;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat-card"><div class="num">${state.players.length}</div><div class="lbl">Kỳ thủ</div></div>
+    <div class="stat-card"><div class="num">${totalMatches}</div><div class="lbl">Trận đã đấu</div></div>
+    <div class="stat-card"><div class="num">${champion ? champion.elo : '-'}</div><div class="lbl">Elo cao nhất</div></div>
+    <div class="stat-card"><div class="num">${masters}</div><div class="lbl">Tông Sư</div></div>
+  `;
+
+  // Desktop leaderboard
+  const lb = document.getElementById('leaderboard');
+  lb.innerHTML = sorted.map((p, idx) => {
+    const rank = idx + 1;
+    let medalCls = 'rank-other';
+    if (rank === 1) medalCls = 'rank-1';
+    else if (rank === 2) medalCls = 'rank-2';
+    else if (rank === 3) medalCls = 'rank-3';
+    return `
+      <tr>
+        <td><span class="rank-medal ${medalCls}">${rank}</span></td>
+        <td class="name-col">${escapeHtml(p.name)}</td>
+        <td>${p.total}</td>
+        <td style="color:#70AD47; font-weight:600">${p.wins}</td>
+        <td style="color:#C00000; font-weight:600">${p.losses}</td>
+        <td class="elo-col">${p.elo}</td>
+        <td><span class="tier ${p.tier.cls}">${p.tier.name}</span></td>
+      </tr>
+    `;
+  }).join('');
+
+  // Mobile leaderboard
+  const lbm = document.getElementById('leaderboardMobile');
+  lbm.innerHTML = sorted.map((p, idx) => {
+    const rank = idx + 1;
+    let medalCls = 'rank-other';
+    if (rank === 1) medalCls = 'rank-1';
+    else if (rank === 2) medalCls = 'rank-2';
+    else if (rank === 3) medalCls = 'rank-3';
+    return `
+      <div class="lb-row">
+        <span class="rank-medal lb-medal ${medalCls}">${rank}</span>
+        <div class="lb-name">${escapeHtml(p.name)}</div>
+        <div class="lb-elo">${p.elo}</div>
+        <div class="lb-meta">
+          <div class="wl">
+            <span style="color:#70AD47"><b>${p.wins}</b> Thắng</span>
+            <span style="color:#C00000"><b>${p.losses}</b> Thua</span>
+          </div>
+          <span class="tier ${p.tier.cls}" style="font-size:10px; padding:3px 8px;">${getTierShort(p.tier.name)}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Selects
+  const opts = state.players.map(p => `<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)}</option>`).join('');
+  document.getElementById('winner').innerHTML = opts;
+  document.getElementById('loser').innerHTML = opts;
+  if (state.players.length >= 2) document.getElementById('loser').selectedIndex = 1;
+
+  // History
+  const hb = document.getElementById('historyBody');
+  const hbm = document.getElementById('historyMobile');
+  document.getElementById('matchCount').textContent = state.matches.length;
+  if (state.matches.length === 0) {
+    hb.innerHTML = `<tr><td colspan="6" class="empty-state">Chưa có trận đấu nào</td></tr>`;
+    hbm.innerHTML = `<div class="empty-state">Chưa có trận đấu nào</div>`;
+  } else {
+    const reversed = state.matches.slice().reverse();
+    hb.innerHTML = reversed.map((m, idx) => {
+      const realIdx = state.matches.length - 1 - idx;
+      return `
+        <tr>
+          <td>${realIdx + 1}</td>
+          <td>${formatDate(m.date)}</td>
+          <td style="color:#70AD47; font-weight:600">${escapeHtml(m.winner)}</td>
+          <td style="color:#C00000">${escapeHtml(m.loser)}</td>
+          <td style="text-align:left">${escapeHtml(m.note || '')}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteMatch(${realIdx})">Xóa 🔒</button></td>
+        </tr>
+      `;
+    }).join('');
+    hbm.innerHTML = reversed.map((m, idx) => {
+      const realIdx = state.matches.length - 1 - idx;
+      return `
+        <div class="hist-row">
+          <div class="hist-result">
+            <span class="hist-w">🏆 ${escapeHtml(m.winner)}</span>
+            <span style="color:#888">vs</span>
+            <span class="hist-l">${escapeHtml(m.loser)}</span>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="deleteMatch(${realIdx})">Xóa 🔒</button>
+          <div class="hist-meta">#${realIdx+1} • ${formatDate(m.date)}${m.note ? ' • ' + escapeHtml(m.note) : ''}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Player cards
+  const pc = document.getElementById('playerCards');
+  pc.innerHTML = state.players.map((p, i) => {
+    const stat = stats.find(s => s.id === p.id);
+    const info = p.info || {};
+    return `
+      <div class="player-card" onclick="openPlayerInfo(${i})">
+        <div class="pc-name">👤 ${escapeHtml(p.name)}</div>
+        ${info.fullname ? `<div class="pc-real">${escapeHtml(info.fullname)}</div>` : '<div class="pc-real" style="color:#BBB;font-style:italic">Chưa có họ tên</div>'}
+        <div class="pc-meta">
+          ${info.age ? `<span>🎂 ${escapeHtml(info.age)}</span>` : ''}
+          ${info.phone ? `<span>📱 ${escapeHtml(info.phone)}</span>` : ''}
+        </div>
+        <div style="margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:6px; padding-top:4px;">
+          <span class="elo-col" style="font-size:13px">Elo: ${stat.elo}</span>
+          <span class="tier ${stat.tier.cls}" style="font-size:10px; padding:3px 8px;">${getTierShort(stat.tier.name)}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  if (!document.getElementById('matchDate').value) {
+    document.getElementById('matchDate').value = new Date().toISOString().slice(0,10);
+  }
+}
+
+function requirePwd(description, onSuccess) {
+  pendingAction = onSuccess;
+  document.getElementById('pwdDesc').textContent = description;
+  document.getElementById('pwdInput').value = '';
+  document.getElementById('modalPwd').classList.add('show');
+  setTimeout(() => document.getElementById('pwdInput').focus(), 100);
+}
+function confirmPwd() {
+  const input = document.getElementById('pwdInput').value;
+  if (input === getPwd()) {
+    closeModal('modalPwd');
+    if (pendingAction) pendingAction();
+    pendingAction = null;
+  } else {
+    toast('Sai mật khẩu!', 'error');
+    document.getElementById('pwdInput').value = '';
+    document.getElementById('pwdInput').focus();
+  }
+}
+function cancelPwd() {
+  pendingAction = null;
+  closeModal('modalPwd');
+}
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('pwdInput').addEventListener('keypress', e => {
+    if (e.key === 'Enter') confirmPwd();
+  });
+});
+
+function addMatch() {
+  const winner = document.getElementById('winner').value;
+  const loser  = document.getElementById('loser').value;
+  const date   = document.getElementById('matchDate').value || new Date().toISOString().slice(0,10);
+  const note   = document.getElementById('note').value.trim();
+  if (winner === loser) return toast('Người thắng và người thua phải khác nhau!', 'error');
+  state.matches.push({ winner, loser, date, note });
+  save();
+  document.getElementById('note').value = '';
+  render();
+  toast(`Đã ghi: ${winner} thắng ${loser}`);
+}
+
+function deleteMatch(idx) {
+  requirePwd('Cần mật khẩu để xóa trận đấu', () => {
+    state.matches.splice(idx, 1);
+    save(); render();
+    toast('Đã xóa trận đấu');
+  });
+}
+
+function undoLast() {
+  if (state.matches.length === 0) return toast('Không có trận nào để hoàn tác', 'warning');
+  requirePwd('Cần mật khẩu để hoàn tác trận đấu', () => {
+    const m = state.matches.pop();
+    save(); render();
+    toast(`Đã hoàn tác: ${m.winner} vs ${m.loser}`);
+  });
+}
+
+function resetAll() {
+  requirePwd('⚠️ Đặt lại sẽ XÓA TOÀN BỘ lịch sử & thông tin!', () => {
+    if (!confirm('Bạn có chắc chắn muốn XÓA HẾT mọi dữ liệu?')) return;
+    localStorage.removeItem(STORAGE_KEY);
+    state = {
+      players: DEFAULT_PLAYERS.map((name, i) => ({
+        id: i+1, name, startElo: STARTING_ELO,
+        info: { fullname: '', age: '', phone: '', joined: new Date().toISOString().slice(0,10), strength: '', note: '' },
+      })),
+      matches: [],
+    };
+    save(); render();
+    toast('Đã đặt lại toàn bộ');
+  });
+}
+
+function openEditNames() {
+  const list = document.getElementById('nameEditList');
+  list.innerHTML = state.players.map((p, i) => `
+    <div class="name-edit">
+      <span>${i+1}.</span>
+      <input type="text" data-idx="${i}" value="${escapeHtml(p.name)}">
+    </div>
+  `).join('');
+  document.getElementById('modalEdit').classList.add('show');
+}
+function saveNames() {
+  const inputs = document.querySelectorAll('#nameEditList input');
+  const newNames = Array.from(inputs).map(i => i.value.trim());
+  const set = new Set(newNames);
+  if (set.size !== newNames.length) return toast('Tên không được trùng!', 'error');
+  if (newNames.some(n => !n)) return toast('Tên không được để trống!', 'error');
+  inputs.forEach(input => {
+    const idx = parseInt(input.dataset.idx);
+    const oldName = state.players[idx].name;
+    const newName = input.value.trim();
+    if (oldName !== newName) {
+      state.matches.forEach(m => {
+        if (m.winner === oldName) m.winner = newName;
+        if (m.loser  === oldName) m.loser  = newName;
+      });
+      state.players[idx].name = newName;
+    }
+  });
+  save(); render(); closeModal('modalEdit');
+  toast('Đã cập nhật tên');
+}
+
+function openPlayerInfo(idx) {
+  currentPlayerIdx = idx;
+  const p = state.players[idx];
+  const info = p.info || {};
+  document.getElementById('playerModalTitle').textContent = `👤 ${p.name}`;
+  document.getElementById('pi-nickname').value = p.name;
+  document.getElementById('pi-fullname').value = info.fullname || '';
+  document.getElementById('pi-age').value = info.age || '';
+  document.getElementById('pi-phone').value = info.phone || '';
+  document.getElementById('pi-joined').value = info.joined || new Date().toISOString().slice(0,10);
+  document.getElementById('pi-strength').value = info.strength || '';
+  document.getElementById('pi-note').value = info.note || '';
+  document.getElementById('modalPlayer').classList.add('show');
+}
+function savePlayerInfo() {
+  if (currentPlayerIdx < 0) return;
+  state.players[currentPlayerIdx].info = {
+    fullname: document.getElementById('pi-fullname').value.trim(),
+    age: document.getElementById('pi-age').value,
+    phone: document.getElementById('pi-phone').value.trim(),
+    joined: document.getElementById('pi-joined').value,
+    strength: document.getElementById('pi-strength').value.trim(),
+    note: document.getElementById('pi-note').value.trim(),
+  };
+  save(); render();
+  closeModal('modalPlayer');
+  toast('Đã lưu thông tin');
+}
+
+function openChangePwd() {
+  document.getElementById('oldPwd').value = '';
+  document.getElementById('newPwd').value = '';
+  document.getElementById('newPwd2').value = '';
+  document.getElementById('modalChangePwd').classList.add('show');
+}
+function saveNewPwd() {
+  const oldP = document.getElementById('oldPwd').value;
+  const newP = document.getElementById('newPwd').value;
+  const newP2 = document.getElementById('newPwd2').value;
+  if (oldP !== getPwd()) return toast('Mật khẩu hiện tại không đúng!', 'error');
+  if (newP.length < 4) return toast('Mật khẩu mới phải tối thiểu 4 ký tự!', 'error');
+  if (newP !== newP2) return toast('Mật khẩu nhập lại không khớp!', 'error');
+  setPwd(newP);
+  closeModal('modalChangePwd');
+  toast('✅ Đã đổi mật khẩu thành công');
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+function exportExcel() {
+  const stats = computeStats();
+  const sorted = [...stats].sort((a,b) => b.elo - a.elo || b.wins - a.wins);
+
+  const sheet1Data = [
+    ['BẢNG XẾP HẠNG 31 ĐƯỜNG 8'],
+    ['Mỗi trận thắng: +5 Elo cho người thắng, -5 Elo cho người thua • Hòa: 0 điểm'],
+    [],
+    ['Hạng', 'Tên Kỳ Thủ', 'Elo Khởi Đầu', 'Số Trận', 'Thắng', 'Thua', 'Elo Hiện Tại', 'Cấp Bậc'],
+  ];
+  sorted.forEach((p, i) => sheet1Data.push([i+1, p.name, p.startElo, p.total, p.wins, p.losses, p.elo, p.tier.name]));
+  sheet1Data.push([], ['BẢNG QUY ĐỔI CẤP BẬC'], ['Khoảng Elo', 'Cấp Bậc']);
+  [
+    ['≤ 1200', 'Tập Sự'], ['1201 - 1300', 'Kỳ Thủ'], ['1301 - 1400', 'Kỳ Sỹ'],
+    ['1401 - 1500', 'Kỳ Vương'], ['1501 - 1600', 'Kỳ Thánh'],
+    ['1601 - 1700', 'Kỳ Tiên'], ['≥ 1701', 'Nhất Đại Tông Sư'],
+  ].forEach(r => sheet1Data.push(r));
+  const ws1 = XLSX.utils.aoa_to_sheet(sheet1Data);
+  ws1['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }, { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } }];
+  ws1['!cols'] = [{wch:8},{wch:22},{wch:14},{wch:10},{wch:10},{wch:10},{wch:14},{wch:22}];
+
+  const sheet3Data = [
+    ['THÔNG TIN KỲ THỦ'], [],
+    ['STT', 'Biệt Danh', 'Họ Và Tên', 'Tuổi', 'Số Điện Thoại', 'Ngày Tham Gia', 'Sở Trường', 'Ghi Chú'],
+  ];
+  state.players.forEach((p, i) => {
+    const info = p.info || {};
+    sheet3Data.push([i+1, p.name, info.fullname || '', info.age || '', info.phone || '', formatDate(info.joined) || '', info.strength || '', info.note || '']);
+  });
+  const ws3 = XLSX.utils.aoa_to_sheet(sheet3Data);
+  ws3['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 7 } }];
+  ws3['!cols'] = [{wch:6},{wch:18},{wch:24},{wch:8},{wch:16},{wch:14},{wch:20},{wch:32}];
+
+  const sheet2Data = [['LỊCH SỬ ĐẤU'], [], ['STT', 'Ngày', 'Người Thắng', 'Người Thua', 'Ghi Chú']];
+  state.matches.forEach((m, i) => sheet2Data.push([i+1, formatDate(m.date), m.winner, m.loser, m.note || '']));
+  const ws2 = XLSX.utils.aoa_to_sheet(sheet2Data);
+  ws2['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 4 } }];
+  ws2['!cols'] = [{wch:8},{wch:14},{wch:22},{wch:22},{wch:32}];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws1, 'Bảng Xếp Hạng');
+  XLSX.utils.book_append_sheet(wb, ws3, 'Thông Tin Kỳ Thủ');
+  XLSX.utils.book_append_sheet(wb, ws2, 'Lịch Sử Đấu');
+
+  XLSX.writeFile(wb, `BangXepHang_31Duong8_${new Date().toISOString().slice(0,10)}.xlsx`);
+  toast('Đã xuất file Excel!');
+}
+
+function toast(msg, type) {
+  const t = document.createElement('div');
+  t.className = 'toast' + (type === 'error' ? ' error' : type === 'warning' ? ' warning' : '');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+document.querySelectorAll('.modal-bg').forEach(bg => {
+  bg.addEventListener('click', e => {
+    if (e.target === bg && bg.id !== 'modalPwd') bg.classList.remove('show');
+  });
+});
+
+load();
+render();
+</script>
 </body>
 </html>
