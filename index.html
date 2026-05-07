@@ -16,11 +16,8 @@
   }
   .container { max-width: 1280px; margin: 0 auto; }
   header {
-    background: white;
-    padding: 24px 32px;
-    border-radius: 16px 16px 0 0;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    text-align: center;
+    background: white; padding: 24px 32px; border-radius: 16px 16px 0 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1); text-align: center;
   }
   header h1 { color: #1F3864; font-size: 32px; margin-bottom: 6px; letter-spacing: 1px; }
   header p { color: #666; font-size: 14px; }
@@ -30,7 +27,11 @@
   }
   .lock-badge { margin-left: auto; background: #FEF3C7; color: #92400E; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
   .btn { padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; white-space: nowrap; }
+  .btn-primary { background: #4472C4; color: white; }
   .btn-success { background: #70AD47; color: white; }
+  .btn-warning { background: #ED7D31; color: white; }
+  .btn-danger { background: #C00000; color: white; }
+  .btn-secondary { background: #BFBFBF; color: #222; }
   main { background: white; padding: 24px 32px; border-radius: 0 0 16px 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
   .section { margin-bottom: 28px; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
@@ -39,10 +40,11 @@
   .card h2 { color: #1F3864; font-size: 18px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid #4472C4; display: flex; align-items: center; gap: 8px; }
   .form-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
   .form-row label { font-size: 13px; font-weight: 600; color: #555; }
-  .form-row select, .form-row input { padding: 10px 12px; border: 1.5px solid #D0D7E2; border-radius: 8px; font-size: 14px; }
+  .form-row select, .form-row input, .form-row textarea { padding: 10px 12px; border: 1.5px solid #D0D7E2; border-radius: 8px; font-size: 14px; }
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th { background: #4472C4; color: white; padding: 12px 10px; text-align: center; }
+  th { background: #4472C4; color: white; padding: 12px 10px; text-align: center; position: sticky; top: 0; }
   td { padding: 10px; border-bottom: 1px solid #E0E6F0; text-align: center; }
+  .elo-col { font-weight: 700; color: #1F3864; font-size: 16px; }
   .rank-medal { display: inline-block; width: 32px; height: 32px; line-height: 32px; border-radius: 50%; font-weight: 700; color: white; }
   .rank-1 { background: #FFD700; color: #5C4400; }
   .rank-2 { background: #C0C0C0; color: #333; }
@@ -50,24 +52,41 @@
   .tier { display: inline-block; padding: 5px 14px; border-radius: 20px; font-weight: 700; font-size: 11px; color: white; }
   .tier-tap-su { background: #BFBFBF; color: #333; }
   .scroll-table { max-height: 500px; overflow-y: auto; border-radius: 8px; border: 1px solid #E0E6F0; }
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .stat-card { background: linear-gradient(135deg, #4472C4, #1F3864); color: white; padding: 16px; border-radius: 12px; text-align: center; }
+  .stat-card .num { font-size: 28px; font-weight: 700; }
   .toast { position: fixed; top: 20px; right: 20px; background: #70AD47; color: white; padding: 15px 25px; border-radius: 8px; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-  .toast.warning { background: #ED7D31; }
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
+  .modal-bg.show { display: flex; }
+  .modal { background: white; border-radius: 12px; padding: 24px; max-width: 500px; width: 100%; }
+  .player-cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .player-card { background: white; border: 1px solid #E0E6F0; border-radius: 10px; padding: 14px; cursor: pointer; }
+  @media (max-width: 700px) {
+    .stat-grid { grid-template-columns: 1fr 1fr; }
+    header h1 { font-size: 20px; }
+    .toolbar { display: grid; grid-template-columns: 1fr 1fr; }
+  }
 </style>
 </head>
 <body>
 <div class="container">
   <header>
     <h1>♟️ BẢNG XẾP HẠNG 31 ĐƯỜNG 8</h1>
-    <p>Hệ thống tự động tính Elo và Cấp bậc</p>
+    <p>Dữ liệu đồng bộ trực tiếp với Google Sheets</p>
   </header>
+
   <div class="toolbar">
     <button class="btn btn-success" onclick="exportExcel()">📥 Xuất Excel</button>
+    <button class="btn btn-warning" onclick="loadFromSheets()">🔄 Làm mới</button>
     <span class="lock-badge">🌐 Dữ liệu Online</span>
   </div>
+
   <main>
+    <div class="stat-grid" id="stats"></div>
+
     <div class="section">
       <div class="card">
-        <h2>🏆 Top Kỳ Thủ</h2>
+        <h2>🏆 Bảng Xếp Hạng</h2>
         <div class="scroll-table">
           <table>
             <thead>
@@ -78,6 +97,7 @@
         </div>
       </div>
     </div>
+
     <div class="section grid-2">
       <div class="card">
         <h2>⚔️ Thêm Trận Đấu</h2>
@@ -86,6 +106,7 @@
         <div class="form-row"><label>Ghi chú</label><input type="text" id="note" placeholder="VD: Giao lưu..."></div>
         <button class="btn btn-success" style="width:100%; padding: 15px;" onclick="addMatch()">✅ Ghi nhận & Lưu Online</button>
       </div>
+
       <div class="card">
         <h2>📜 Lịch Sử Đấu</h2>
         <div class="scroll-table">
@@ -98,22 +119,25 @@
     </div>
   </main>
 </div>
+
 <script>
-// LINK ĐÃ ĐƯỢC SỬA LẠI CHÍNH XÁC (Chữ lqUP thay vì IqUP)
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxiS_hdtM6_WMCsCYy5j3w0DXUc69Ax9TILFB73SwdNLRBqrk21wlqUPq66pmZMJnA/exec';
 
 const PLAYERS = ["Trọng", "Thường", "Huy Anh", "Huy Em", "Hội", "Thanh Duy", "Quyền", "Hoàng", "Hoàn Nguyễn", "Phạm Hậu", "Trinh", "Văn Khải", "Đình Song", "Nhật Nguyễn", "Vân", "Liêm"];
+
 let state = { matches: [] };
 
 async function loadFromSheets() {
+  showToast('⏳ Đang tải dữ liệu...', 'warning');
   try {
     const res = await fetch(SCRIPT_URL);
     const data = await res.json();
     state.matches = Array.isArray(data) ? data : [];
     render();
-  } catch (e) { 
-    console.error("Lỗi:", e);
-    render(); // Vẫn render danh sách kỳ thủ kể cả khi Sheets trống
+    showToast('✅ Đã cập nhật!');
+  } catch (e) {
+    console.error(e);
+    render();
   }
 }
 
@@ -122,182 +146,28 @@ async function addMatch() {
   const loser = document.getElementById('loser').value;
   const note = document.getElementById('note').value;
   const date = new Date().toLocaleDateString('vi-VN');
-  if (winner === loser) return alert('Trùng tên!');
-  showToast('⏳ Đang lưu...', 'warning');
+
+  if (winner === loser) return showToast('Không thể tự đấu với chính mình!', 'error');
+
+  showToast('⏳ Đang gửi lên Google Sheets...', 'warning');
+
   try {
-    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ winner, loser, date, note }) });
+    // Gửi dữ liệu đi
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify({ winner, loser, date, note })
+    });
+    
+    // Cập nhật giao diện tạm thời
     state.matches.push({ winner, loser, date, note });
     render();
-    showToast('✅ Thành công!');
-  } catch (e) { alert('Lỗi mạng!'); }
+    document.getElementById('note').value = '';
+    showToast('✅ Đã lưu thành công!');
+  } catch (e) {
+    showToast('❌ Lỗi kết nối!', 'error');
+  }
 }
 
 function render() {
-  const stats = PLAYERS.map(name => ({ name, wins: 0, losses: 0, elo: 1200 }));
-  state.matches.forEach(m => {
-    const w = stats.find(p => p.name === m.winner);
-    const l = stats.find(p => p.name === m.loser);
-    if (w) { w.wins++; w.elo += 5; }
-    if (l) { l.losses++; l.elo -= 5; }
-  });
-  const sorted = stats.sort((a,b) => b.elo - a.elo);
-  document.getElementById('leaderboard').innerHTML = sorted.map((p, i) => `
-    <tr>
-      <td><span class="rank-medal ${i<3?'rank-'+(i+1):''}">${i+1}</span></td>
-      <td><b>${p.name}</b></td><td>${p.wins+p.losses}</td><td style="color:green">${p.wins}</td><td style="color:red">${p.losses}</td>
-      <td style="color:#1F3864"><b>${p.elo}</b></td><td><span class="tier tier-tap-su">Tập Sự</span></td>
-    </tr>`).join('');
-  document.getElementById('historyBody').innerHTML = [...state.matches].reverse().map(m => `<tr><td>${m.date}</td><td style="color:green">${m.winner}</td><td>${m.loser}</td></tr>`).join('');
-}
-
-function showToast(msg, type='success') {
-  const t = document.createElement('div'); t.className = `toast ${type}`; t.textContent = msg;
-  document.body.appendChild(t); setTimeout(() => t.remove(), 3000);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const opts = PLAYERS.map(p => `<option value="${p}">${p}</option>`).join('');
-  document.getElementById('winner').innerHTML = opts;
-  document.getElementById('loser').innerHTML = opts;
-  loadFromSheets();
-});
-</script>
-</body>
-</html><!DOCTYPE html>
-<html lang="vi">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bảng Xếp Hạng 31 Đường 8</title>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: linear-gradient(135deg, #1F3864 0%, #4472C4 100%);
-    min-height: 100vh;
-    padding: 20px;
-    color: #222;
-  }
-  .container { max-width: 1280px; margin: 0 auto; }
-  header {
-    background: white;
-    padding: 24px 32px;
-    border-radius: 16px 16px 0 0;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    text-align: center;
-  }
-  header h1 { color: #1F3864; font-size: 32px; margin-bottom: 6px; letter-spacing: 1px; }
-  header p { color: #666; font-size: 14px; }
-
-  .toolbar {
-    background: #F2F5FA;
-    padding: 12px 32px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    border-bottom: 1px solid #E0E6F0;
-    align-items: center;
-  }
-  .lock-badge {
-    margin-left: auto;
-    background: #FEF3C7;
-    color: #92400E;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-  }
-
-  .btn {
-    padding: 10px 18px; border: none; border-radius: 8px; cursor: pointer;
-    font-weight: 600; font-size: 14px; transition: all 0.2s; white-space: nowrap;
-  }
-  .btn-primary { background: #4472C4; color: white; }
-  .btn-primary:hover { background: #1F3864; }
-  .btn-success { background: #70AD47; color: white; }
-  .btn-success:hover { background: #548235; }
-  .btn-danger { background: #C00000; color: white; }
-  .btn-danger:hover { background: #8B0000; }
-
-  main {
-    background: white;
-    padding: 24px 32px;
-    border-radius: 0 0 16px 16px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  }
-
-  .section { margin-bottom: 28px; }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
-
-  .card {
-    background: #FAFBFD; border: 1px solid #E0E6F0;
-    border-radius: 12px; padding: 20px;
-  }
-  .card h2 {
-    color: #1F3864; font-size: 18px; margin-bottom: 16px;
-    padding-bottom: 10px; border-bottom: 2px solid #4472C4;
-    display: flex; align-items: center; gap: 8px;
-  }
-
-  .form-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
-  .form-row label { font-size: 13px; font-weight: 600; color: #555; }
-  .form-row select, .form-row input {
-    padding: 10px 12px; border: 1.5px solid #D0D7E2; border-radius: 8px;
-    font-size: 14px;
-  }
-
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th {
-    background: #4472C4; color: white; padding: 12px 10px; text-align: center;
-    font-weight: 600;
-  }
-  td { padding: 10px; border-bottom: 1px solid #E0E6F0; text-align: center; }
-
-  .rank-medal {
-    display: inline-block; width: 32px; height: 32px; line-height: 32px;
-    border-radius: 50%; font-weight: 700; color: white;
-  }
-  .rank-1 { background: #FFD700; color: #5C4400; }
-  .rank-2 { background: #C0C0C0; color: #333; }
-  .rank-3 { background: #CD7F32; }
-
-  .tier {
-    display: inline-block; padding: 5px 14px; border-radius: 20px;
-    font-weight: 700; font-size: 11px; color: white;
-  }
-  .tier-tap-su { background: #BFBFBF; color: #333; }
-  .tier-tong-su { background: linear-gradient(135deg, #7030A0, #4B0082); }
-
-  .scroll-table { max-height: 500px; overflow-y: auto; border-radius: 8px; border: 1px solid #E0E6F0; }
-  
-  .toast {
-    position: fixed; top: 20px; right: 20px;
-    background: #70AD47; color: white; padding: 15px 25px;
-    border-radius: 8px; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-  }
-  .toast.error { background: #C00000; }
-  .toast.warning { background: #ED7D31; }
-
-  @media (max-width: 700px) {
-    body { padding: 10px; }
-    header h1 { font-size: 22px; }
-    .lb-desktop, .hist-desktop { display: none; }
-  }
-</style>
-</head>
-<body>
-<div class="container">
-  <header>
-    <h1>♟️ BẢNG XẾP HẠNG 31 ĐƯỜNG 8</h1>
-    <p>Hệ thống tự động tính Elo và Cấp bậc</p>
-  </header>
-
-  <div class="toolbar">
-    <button class="btn btn-success" onclick="exportExcel()">📥 Xuất Excel</button>
-    <span class="lock-badge">🌐 Dữ liệu Online</span>
-  </div>
-
-  <main>
-    <div class
+  const stats = PLAYERS.map(name => ({ name, wins: 0, losses: 0, elo:
