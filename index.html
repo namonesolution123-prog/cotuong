@@ -1,68 +1,114 @@
 <div id="bxh-container">
-    <p>Đang tải dữ liệu bảng xếp hạng...</p>
+    <p style="text-align:center;">Đang tải dữ liệu bảng xếp hạng...</p>
 </div>
 
 <style>
-    #bxh-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-family: Arial, sans-serif; }
-    #bxh-table th, #bxh-table td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-    #bxh-table th { background-color: #4CAF50; color: white; }
-    #bxh-table tr:nth-child(even) { background-color: #f2 f2 f2; }
-    #bxh-table tr:hover { background-color: #ddd; }
-    .cap-bac { font-weight: bold; padding: 4px 8px; border-radius: 4px; }
+    /* CSS để bảng đẹp và chuyên nghiệp */
+    #bxh-table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        margin: 20px 0; 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 14px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    #bxh-table th, #bxh-table td { 
+        border: 1px solid #ececec; 
+        padding: 12px 8px; 
+        text-align: center; 
+    }
+    #bxh-table th { 
+        background-color: #2c3e50; 
+        color: white; 
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    #bxh-table tr:nth-child(even) { background-color: #f9f9f9; }
+    #bxh-table tr:hover { background-color: #f1f1f1; }
+    
+    /* Màu sắc riêng cho từng cấp bậc */
+    .rank-tag {
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: bold;
+        font-size: 12px;
+        display: inline-block;
+        min-width: 80px;
+    }
+    .tap-su { background-color: #bdc3c7; color: #fff; }
+    .ky-thu { background-color: #3498db; color: #fff; }
+    .ky-sy { background-color: #2ecc71; color: #fff; }
+    .ky-vuong { background-color: #f1c40f; color: #000; }
+    .ky-thanh { background-color: #e67e22; color: #fff; }
+    .ky-tien { background-color: #e74c3c; color: #fff; }
+    .tong-su { background-color: #9b59b6; color: #fff; }
 </style>
 
 <script>
-    // 1. Cấu hình ID và tên Sheet
     const sheetId = '1kaL5N-PNqQfzC6wLSpKcCcZFPnlg7cae';
-    const sheetName = 'Sheet1'; // Tên sheet chứa dữ liệu của bạn
-    const base = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
+    const sheetName = 'Sheet1'; 
+    // Range=A:H để lấy đúng 8 cột bảng xếp hạng, bỏ qua bảng tra cứu bên phải
+    const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${sheetName}&range=A:H`;
 
-    function loadBXH() {
-        fetch(base)
-            .then(res => res.text())
-            .then(csvText => {
-                // 2. Chuyển đổi CSV thành mảng (Array)
-                const rows = csvText.split('\n').map(row => {
-                    // Loại bỏ dấu ngoặc kép thừa do Google Sheets xuất ra
-                    return row.split(',').map(cell => cell.replace(/^"(.*)"$/, '$1'));
-                });
-
-                // 3. Tạo bảng HTML
-                let tableHtml = '<table id="bxh-table"><thead><tr>';
-                
-                // Lấy tiêu đề (Hàng 1)
-                const headers = rows[0];
-                headers.forEach(header => {
-                    tableHtml += `<th>${header}</th>`;
-                });
-                tableHtml += '</tr></thead><tbody>';
-
-                // Lấy dữ liệu (Từ hàng 2 trở đi)
-                // Lưu ý: Dữ liệu lúc này đã được Google Sheets tự động sắp xếp (nếu bạn dùng hàm SORT ở Sheets)
-                for (let i = 1; i < rows.length; i++) {
-                    if (rows[i][1] === "") continue; // Bỏ qua hàng trống
-                    tableHtml += '<tr>';
-                    rows[i].forEach((cell, index) => {
-                        // Thêm màu sắc cho cột Cấp Bậc (Cột H - index 7)
-                        if (index === 7) {
-                            tableHtml += `<td><span class="cap-bac">${cell}</span></td>`;
-                        } else {
-                            tableHtml += `<td>${cell}</td>`;
-                        }
-                    });
-                    tableHtml += '</tr>';
-                }
-                tableHtml += '</tbody></table>';
-
-                // 4. Hiển thị lên web
-                document.getElementById('bxh-container').innerHTML = tableHtml;
-            })
-            .catch(err => {
-                console.error(err);
-                document.getElementById('bxh-container').innerHTML = "Lỗi khi tải dữ liệu.";
+    async function loadGoogleSheet() {
+        try {
+            const response = await fetch(url);
+            const data = await response.text();
+            
+            // Chuyển CSV thành mảng dữ liệu
+            const rows = data.split('\n').map(row => {
+                return row.split(',').map(cell => cell.replace(/^"(.*)"$/, '$1'));
             });
+
+            let tableHtml = '<table id="bxh-table"><thead><tr>';
+            
+            // Vẽ tiêu đề (Hàng 0)
+            rows[0].forEach(header => {
+                tableHtml += `<th>${header}</th>`;
+            });
+            tableHtml += '</tr></thead><tbody>';
+
+            // Vẽ dữ liệu (Từ hàng 1 trở đi)
+            for (let i = 1; i < rows.length; i++) {
+                const rowData = rows[i];
+                
+                // Điều kiện: Nếu cột Tên Kỳ Thủ (index 1) trống thì bỏ qua
+                if (!rowData[1] || rowData[1].trim() === "") continue;
+
+                tableHtml += '<tr>';
+                rowData.forEach((cell, index) => {
+                    if (index === 7) { // Cột Cấp Bậc (index 7)
+                        let styleClass = getRankClass(cell);
+                        tableHtml += `<td><span class="rank-tag ${styleClass}">${cell}</span></td>`;
+                    } else {
+                        tableHtml += `<td>${cell}</td>`;
+                    }
+                });
+                tableHtml += '</tr>';
+            }
+            
+            tableHtml += '</tbody></table>';
+            document.getElementById('bxh-container').innerHTML = tableHtml;
+
+        } catch (error) {
+            document.getElementById('bxh-container').innerHTML = "<p style='color:red;'>Lỗi tải dữ liệu. Vui lòng kiểm tra lại quyền chia sẻ Sheet.</p>";
+        }
     }
 
-    // Gọi hàm khi trang web tải xong
-    window.onload = loadBXH;
+    // Hàm phân loại class CSS cho Cấp Bậc
+    function getRankClass(rank) {
+        if (!rank) return "";
+        rank = rank.toLowerCase();
+        if (rank.includes("tập sự")) return "tap-su";
+        if (rank.includes("kỳ thủ")) return "ky-thu";
+        if (rank.includes("kỳ sỹ")) return "ky-sy";
+        if (rank.includes("kỳ vương")) return "ky-vuong";
+        if (rank.includes("kỳ thánh")) return "ky-thanh";
+        if (rank.includes("kỳ tiên")) return "ky-tien";
+        if (rank.includes("tông sư")) return "tong-su";
+        return "";
+    }
+
+    // Chạy hàm khi web load xong
+    window.onload = loadGoogleSheet;
 </script>
